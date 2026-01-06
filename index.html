@@ -1,98 +1,131 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>RNG Gun Game</title>
 
 <style>
-/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Comic Sans MS", "Trebuchet MS", sans-serif;
+  font-family: Arial, sans-serif;
 }
 
-/* Animated background */
+/* Sky background */
 body {
   height: 100vh;
   overflow: hidden;
-  background: url("https://i.imgur.com/8QZQZQZ.png");
-  background-size: cover;
-  animation: moveBg 20s linear infinite;
-  filter: blur(0px);
+  background: linear-gradient(#70c5ce, #bfefff);
 }
 
-/* Fake flappy-style movement */
-@keyframes moveBg {
-  from { background-position: 0 0; }
-  to { background-position: -2000px 0; }
-}
-
-/* Dark overlay */
-.overlay {
+/* Moving clouds */
+.clouds {
   position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(6px);
+  width: 200%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 20% 30%, white 60px, transparent 61px),
+    radial-gradient(circle at 30% 30%, white 80px, transparent 81px),
+    radial-gradient(circle at 60% 40%, white 70px, transparent 71px),
+    radial-gradient(circle at 70% 40%, white 90px, transparent 91px);
+  opacity: 0.6;
+  animation: cloudsMove 40s linear infinite;
+  filter: blur(4px);
 }
 
-/* Center content */
-.container {
+@keyframes cloudsMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Pipes */
+.pipes {
+  position: absolute;
+  width: 200%;
+  height: 100%;
+  background:
+    linear-gradient(#4CAF50, #2E7D32) 20% 0 / 80px 100% no-repeat,
+    linear-gradient(#4CAF50, #2E7D32) 40% 0 / 80px 100% no-repeat,
+    linear-gradient(#4CAF50, #2E7D32) 60% 0 / 80px 100% no-repeat;
+  animation: pipesMove 12s linear infinite;
+  opacity: 0.4;
+  filter: blur(6px);
+}
+
+@keyframes pipesMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Center menu */
+.menu {
   position: relative;
-  z-index: 2;
+  z-index: 5;
   height: 100%;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-/* Big cartoony title */
-h1 {
-  font-size: 80px;
-  color: #fff;
-  text-shadow: 5px 5px 0 #ff00ff, -5px -5px 0 #00ffff;
-  margin-bottom: 40px;
-}
-
-/* Enter button */
-button {
-  font-size: 40px;
-  padding: 20px 60px;
-  border: none;
+/* Roblox-style panel */
+.panel {
+  background: #1e1e1e;
+  padding: 40px 60px;
   border-radius: 20px;
+  box-shadow: 0 20px 0 #111;
+  text-align: center;
+}
+
+/* Title */
+h1 {
+  font-size: 64px;
+  color: white;
+  margin-bottom: 30px;
+  text-shadow: 0 5px 0 #000;
+}
+
+/* Button */
+button {
+  font-size: 32px;
+  padding: 15px 50px;
+  border: none;
+  border-radius: 12px;
+  background: #00b06f;
+  color: white;
   cursor: pointer;
-  background: linear-gradient(45deg, #ff00ff, #00ffff);
-  color: black;
-  transition: all 0.3s ease;
+  box-shadow: 0 8px 0 #007a4a;
+  transition: all 0.15s ease;
 }
 
-/* Hover reaction */
+/* Hover */
 button:hover {
-  transform: scale(1.2) rotate(-2deg);
-  box-shadow: 0 0 40px #00ffff;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 0 #007a4a;
 }
 
-/* Click effect */
+/* Click */
 button:active {
-  transform: scale(1.1);
+  transform: translateY(4px);
+  box-shadow: 0 4px 0 #007a4a;
 }
 </style>
 </head>
 
 <body>
-  <div class="overlay"></div>
+  <div class="clouds"></div>
+  <div class="pipes"></div>
 
-  <div class="container">
-    <h1>RNG GUN GAME</h1>
-    <button onclick="enterGame()">ENTER</button>
+  <div class="menu">
+    <div class="panel">
+      <h1>RNG GUN GAME</h1>
+      <button onclick="enter()">ENTER</button>
+    </div>
   </div>
 
 <script>
-function enterGame() {
-  alert("Game coming soon 👀🔥");
-  // later you can redirect to your game page
+function enter() {
+  alert("Loading game...");
 }
 </script>
 
