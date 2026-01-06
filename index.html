@@ -316,3 +316,13 @@ rollBtn.onclick = () => {
 </script>
 </body>
 </html>
+const bgMusic = document.getElementById("bgMusic");
+const diceSound = document.getElementById("diceSound");
+
+// Play dice sound on roll
+rollBtn.onclick = () => {
+  if (onCooldown) return;
+  diceSound.currentTime = 0;
+  diceSound.play();
+  // ... rest of your roll logic
+};
