@@ -19,27 +19,16 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-/* FRONT PAGE BACKGROUND */
-.front-bg {
-  position: absolute;
-  width: 100%;
-  height: 100%;
   background: linear-gradient(#70c5ce, #bfefff);
-  z-index: 0;
-  overflow: hidden;
 }
 
-.clouds, .pipes {
+/* CLOUDS */
+.clouds {
   position: absolute;
   width: 100%;
   height: 100%;
   top: 0;
   left: 0;
-}
-
-.clouds {
   background:
     radial-gradient(circle at 20% 30%, white 60px, transparent 61px),
     radial-gradient(circle at 30% 30%, white 80px, transparent 81px),
@@ -55,10 +44,12 @@ body {
   100% { transform: translateY(0px); }
 }
 
-/* Pipes just float a bit */
+/* PIPES */
 .pipes {
+  position: absolute;
   display: flex;
   justify-content: space-around;
+  width: 100%;
   height: 100%;
   pointer-events: none;
 }
@@ -156,7 +147,7 @@ body {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.8s ease;
-  background: linear-gradient(#111, #222); /* Game BG */
+  background: linear-gradient(#111, #222);
 }
 
 .menu.visible {
@@ -226,15 +217,17 @@ button:disabled {
 </head>
 <body>
 
+<!-- AUDIO -->
+<audio id="bgMusic" src="Bossa Me.mp3" loop autoplay></audio>
+<audio id="diceSound" src="shake-and-roll-dice-soundbible.mp3"></audio>
+
 <!-- Front page background -->
-<div class="front-bg">
-  <div class="clouds"></div>
-  <div class="pipes">
-    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
-    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
-    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
-    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
-  </div>
+<div class="clouds"></div>
+<div class="pipes">
+  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
 </div>
 
 <!-- FRONT PANEL -->
@@ -260,6 +253,7 @@ button:disabled {
 // Transition from front page to game
 const frontPanel = document.getElementById("frontPanel");
 const gamePanel = document.getElementById("gamePanel");
+const bgMusic = document.getElementById("bgMusic");
 
 function enterGame() {
   frontPanel.classList.add("hidden");
@@ -272,6 +266,7 @@ function enterGame() {
 const rollBtn = document.getElementById("rollBtn");
 const result = document.getElementById("result");
 const fill = document.getElementById("cooldownFill");
+const diceSound = document.getElementById("diceSound");
 
 const cooldownTime = 2000;
 let onCooldown = false;
@@ -289,6 +284,11 @@ rollBtn.onclick = () => {
   rollBtn.disabled = true;
   fill.style.width = "0%";
 
+  // Play dice roll sound
+  diceSound.currentTime = 0;
+  diceSound.play();
+
+  // RNG roll
   const total = rarities.reduce((a, b) => a + b.weight, 0);
   let r = Math.random() * total;
 
@@ -301,6 +301,7 @@ rollBtn.onclick = () => {
   result.textContent = chosen.name;
   result.style.color = chosen.color;
 
+  // Cooldown bar animation
   let start = Date.now();
   const i = setInterval(() => {
     let p = (Date.now() - start) / cooldownTime * 100;
