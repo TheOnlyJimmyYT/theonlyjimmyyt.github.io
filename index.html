@@ -1,116 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Roll Game</title>
-  <style>
-    /* Old UI styles */
-    body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      background: linear-gradient(to bottom, #ffd700, #ff8c00);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      color: #000;
-    }
+<meta charset="UTF-8">
+<title>RNG Roll Game</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(#70c5ce, #bfefff);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
 
-    h1 {
-      font-size: 48px;
-      margin-bottom: 20px;
-    }
+h1 {
+  font-size: 48px;
+  color: #fff;
+  text-shadow: 0 3px 0 #000;
+  margin-bottom: 20px;
+}
 
-    #rollBtn {
-      padding: 20px 40px;
-      font-size: 28px;
-      font-weight: bold;
-      color: #fff;
-      background-color: #ff4500;
-      border: 3px solid #000;
-      border-radius: 20px;
-      cursor: pointer;
-      box-shadow: 0 5px #cc3700;
-      transition: transform 0.1s;
-    }
+#rollBtn {
+  font-size: 32px;
+  padding: 20px 40px;
+  background: linear-gradient(90deg, #ffcc00, #ff9900);
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 8px 0 #cc7a00;
+  transition: all 0.2s ease;
+}
 
-    #rollBtn:active {
-      transform: translateY(3px);
-      box-shadow: 0 2px #cc3700;
-    }
+#rollBtn:disabled {
+  background: #ccc;
+  box-shadow: 0 4px 0 #999;
+  cursor: not-allowed;
+}
 
-    #result {
-      margin-top: 30px;
-      font-size: 36px;
-      font-weight: bold;
-    }
+#rollBtn:hover:not(:disabled) {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 0 #cc7a00;
+}
 
-    #cooldownBar {
-      margin-top: 15px;
-      width: 250px;
-      height: 25px;
-      background: #ddd;
-      border-radius: 15px;
-      overflow: hidden;
-    }
+#result {
+  font-size: 36px;
+  margin-top: 20px;
+  color: #fff;
+  text-shadow: 0 2px 0 #000;
+}
 
-    #cooldownFill {
-      height: 100%;
-      width: 0%;
-      background: #4caf50;
-      transition: width 0.2s linear;
-    }
-  </style>
+.rarity {
+  margin-top: 10px;
+  font-size: 28px;
+  font-weight: bold;
+}
+</style>
 </head>
 <body>
-  <h1>Roll Your Luck!</h1>
-  <button id="rollBtn">Roll Dice!</button>
-  <div id="result">?</div>
-  <div id="cooldownBar">
-    <div id="cooldownFill"></div>
-  </div>
 
-  <!-- Dice roll sound -->
-  <audio id="rollSound" src="https://raw.githubusercontent.com/TheOnlyJimmyYT/theonlyjimmyyt.github.io/main/shake-and-roll-dice-soundbible%20(1).mp3"></audio>
+<h1>RNG Roll Game</h1>
+<button id="rollBtn">ROLL</button>
+<div id="result"></div>
+<div class="rarity" id="rarity"></div>
 
-  <script>
-    const rollBtn = document.getElementById("rollBtn");
-    const result = document.getElementById("result");
-    const rollSound = document.getElementById("rollSound");
-    const cooldownFill = document.getElementById("cooldownFill");
+<audio id="diceSound" src="shake-and-roll-dice-soundbible.mp3"></audio>
 
-    let cooldown = false;
+<script>
+const rollBtn = document.getElementById('rollBtn');
+const result = document.getElementById('result');
+const rarityText = document.getElementById('rarity');
+const diceSound = document.getElementById('diceSound');
 
-    rollBtn.addEventListener("click", () => {
-      if (cooldown) return;
+let cooldown = false;
 
-      cooldown = true;
+rollBtn.addEventListener('click', () => {
+  if (cooldown) return;
 
-      // Play dice sound
-      rollSound.currentTime = 0;
-      rollSound.play();
+  cooldown = true;
+  rollBtn.disabled = true;
 
-      // Old roll logic (Common / Rare / Legendary / Mythic)
-      const rand = Math.random();
-      let outcome = "Common"; // Old default
-      if (rand > 0.95) outcome = "Mythic";
-      else if (rand > 0.75) outcome = "Legendary";
-      else if (rand > 0.5) outcome = "Rare";
+  diceSound.currentTime = 0;
+  diceSound.play();
 
-      result.innerText = outcome;
+  // Random number 1-100
+  const roll = Math.floor(Math.random() * 100) + 1;
+  result.textContent = "You rolled: " + roll;
 
-      // Cooldown bar animation (2 seconds)
-      let fill = 0;
-      const interval = setInterval(() => {
-        fill += 5;
-        cooldownFill.style.width = fill + "%";
-        if (fill >= 100) {
-          clearInterval(interval);
-          cooldown = false;
-          cooldownFill.style.width = "0%";
-        }
-      }, 100); // 100ms * 20 = 2s cooldown
-    });
-  </script>
+  // Determine rarity
+  let rarity;
+  if (roll <= 5) rarity = "Common";
+  else if (roll <= 20) rarity = "Rare";
+  else if (roll <= 75) rarity = "Legendary";
+  else rarity = "Mythic";
+
+  rarityText.textContent = "Rarity: " + rarity;
+
+  // 2-second cooldown
+  setTimeout(() => {
+    cooldown = false;
+    rollBtn.disabled = false;
+  }, 2000);
+});
+</script>
+
 </body>
 </html>
