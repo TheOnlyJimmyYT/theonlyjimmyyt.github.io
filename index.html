@@ -12,14 +12,13 @@
   font-family: Arial, sans-serif;
 }
 
-/* Sky background */
 body {
   height: 100vh;
   overflow: hidden;
   background: linear-gradient(#70c5ce, #bfefff);
 }
 
-/* Moving clouds */
+/* Background motion */
 .clouds {
   position: absolute;
   width: 200%;
@@ -27,8 +26,7 @@ body {
   background:
     radial-gradient(circle at 20% 30%, white 60px, transparent 61px),
     radial-gradient(circle at 30% 30%, white 80px, transparent 81px),
-    radial-gradient(circle at 60% 40%, white 70px, transparent 71px),
-    radial-gradient(circle at 70% 40%, white 90px, transparent 91px);
+    radial-gradient(circle at 60% 40%, white 70px, transparent 71px);
   opacity: 0.6;
   animation: cloudsMove 40s linear infinite;
   filter: blur(4px);
@@ -39,26 +37,7 @@ body {
   to { transform: translateX(-50%); }
 }
 
-/* Pipes */
-.pipes {
-  position: absolute;
-  width: 200%;
-  height: 100%;
-  background:
-    linear-gradient(#4CAF50, #2E7D32) 20% 0 / 80px 100% no-repeat,
-    linear-gradient(#4CAF50, #2E7D32) 40% 0 / 80px 100% no-repeat,
-    linear-gradient(#4CAF50, #2E7D32) 60% 0 / 80px 100% no-repeat;
-  animation: pipesMove 12s linear infinite;
-  opacity: 0.4;
-  filter: blur(6px);
-}
-
-@keyframes pipesMove {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-/* Center menu */
+/* Center UI */
 .menu {
   position: relative;
   z-index: 5;
@@ -68,27 +47,31 @@ body {
   align-items: center;
 }
 
-/* Roblox-style panel */
 .panel {
   background: #1e1e1e;
   padding: 40px 60px;
   border-radius: 20px;
   box-shadow: 0 20px 0 #111;
   text-align: center;
+  width: 420px;
 }
 
-/* Title */
 h1 {
-  font-size: 64px;
+  font-size: 48px;
   color: white;
-  margin-bottom: 30px;
-  text-shadow: 0 5px 0 #000;
+  margin-bottom: 20px;
 }
 
-/* Button */
-button {
+#result {
   font-size: 32px;
-  padding: 15px 50px;
+  margin: 20px 0;
+  color: #ccc;
+}
+
+/* Roll button */
+button {
+  font-size: 28px;
+  padding: 15px 40px;
   border: none;
   border-radius: 12px;
   background: #00b06f;
@@ -98,34 +81,109 @@ button {
   transition: all 0.15s ease;
 }
 
-/* Hover */
-button:hover {
+button:hover:not(:disabled) {
   transform: translateY(-4px);
   box-shadow: 0 12px 0 #007a4a;
 }
 
-/* Click */
-button:active {
+button:active:not(:disabled) {
   transform: translateY(4px);
   box-shadow: 0 4px 0 #007a4a;
+}
+
+button:disabled {
+  background: #555;
+  box-shadow: 0 6px 0 #333;
+  cursor: not-allowed;
+}
+
+/* Cooldown bar */
+.cooldown {
+  width: 100%;
+  height: 18px;
+  background: #333;
+  border-radius: 10px;
+  margin-top: 20px;
+  overflow: hidden;
+}
+
+.cooldown-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00ffff, #00b06f);
 }
 </style>
 </head>
 
 <body>
-  <div class="clouds"></div>
-  <div class="pipes"></div>
 
-  <div class="menu">
-    <div class="panel">
-      <h1>RNG GUN GAME</h1>
-      <button onclick="enter()">ENTER</button>
+<div class="clouds"></div>
+
+<div class="menu">
+  <div class="panel">
+    <h1>RNG GUN GAME</h1>
+
+    <div id="result">Click ROLL</div>
+
+    <button id="rollBtn" onclick="roll()">ROLL</button>
+
+    <div class="cooldown">
+      <div class="cooldown-fill" id="cooldownFill"></div>
     </div>
   </div>
+</div>
 
 <script>
-function enter() {
-  alert("Loading game...");
+const rollBtn = document.getElementById("rollBtn");
+const result = document.getElementById("result");
+const fill = document.getElementById("cooldownFill");
+
+const cooldownTime = 2000; // 2 seconds
+let onCooldown = false;
+
+// RNG table
+const rarities = [
+  { name: "COMMON", weight: 300, color: "#bdbdbd" },
+  { name: "RARE", weight: 100, color: "#4fc3f7" },
+  { name: "LEGENDARY", weight: 30, color: "#ffd54f" },
+  { name: "MYTHIC", weight: 5, color: "#e040fb" }
+];
+
+function roll() {
+  if (onCooldown) return;
+
+  onCooldown = true;
+  rollBtn.disabled = true;
+  fill.style.width = "0%";
+
+  // RNG roll
+  const totalWeight = rarities.reduce((a, b) => a + b.weight, 0);
+  let rand = Math.random() * totalWeight;
+
+  let chosen;
+  for (let r of rarities) {
+    if (rand < r.weight) {
+      chosen = r;
+      break;
+    }
+    rand -= r.weight;
+  }
+
+  result.textContent = chosen.name;
+  result.style.color = chosen.color;
+
+  // Cooldown animation
+  let start = Date.now();
+  const interval = setInterval(() => {
+    let progress = (Date.now() - start) / cooldownTime * 100;
+    fill.style.width = Math.min(progress, 100) + "%";
+
+    if (progress >= 100) {
+      clearInterval(interval);
+      onCooldown = false;
+      rollBtn.disabled = false;
+    }
+  }, 16);
 }
 </script>
 
