@@ -14,18 +14,22 @@
 body {
   height: 100vh;
   overflow: hidden;
-  background: linear-gradient(#70c5ce, #bfefff);
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
 }
 
-/* CLOUD BACKGROUND */
-.clouds {
+/* COMMON BACKGROUNDS */
+.clouds, .pipes {
   position: absolute;
   width: 200%;
   height: 100%;
+  z-index: 0;
+}
+
+/* CLOUDS */
+.clouds {
   background:
     radial-gradient(circle at 20% 30%, white 60px, transparent 61px),
     radial-gradient(circle at 30% 30%, white 80px, transparent 81px),
@@ -33,7 +37,6 @@ body {
   opacity: 0.6;
   animation: cloudsMove 40s linear infinite;
   filter: blur(4px);
-  z-index: 0;
 }
 
 @keyframes cloudsMove {
@@ -43,14 +46,10 @@ body {
 
 /* FLAPPY PIPES */
 .pipes {
-  position: absolute;
-  width: 200%;
-  height: 100%;
   display: flex;
   gap: 320px;
   animation: pipesMove 7s linear infinite;
   filter: blur(3px);
-  z-index: 0;
 }
 
 .pipe-set {
@@ -78,11 +77,11 @@ body {
 }
 
 @keyframes pipesMove {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
-/* FRONT PAGE PANEL */
+/* FRONT PANEL */
 .front-panel {
   position: absolute;
   z-index: 5;
@@ -92,15 +91,16 @@ body {
   text-align: center;
   box-shadow: 0 20px 0 #111;
   backdrop-filter: blur(6px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  transition: all 0.8s ease;
 }
 
 .front-panel.hidden {
   opacity: 0;
+  transform: scale(0.8) rotate(-5deg);
   pointer-events: none;
-  transform: scale(0.9);
 }
 
+/* FRONT PAGE TEXT */
 .front-panel h1 {
   font-size: 64px;
   color: #fff;
@@ -142,7 +142,8 @@ body {
   align-items: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.8s ease;
+  background: linear-gradient(#111, #222); /* new game background */
 }
 
 .menu.visible {
@@ -241,15 +242,15 @@ button:disabled {
 </div>
 
 <script>
+// Transition from front page to game
 const frontPanel = document.getElementById("frontPanel");
 const gamePanel = document.getElementById("gamePanel");
 
-// Show game panel and hide front panel
 function enterGame() {
   frontPanel.classList.add("hidden");
   setTimeout(() => {
     gamePanel.classList.add("visible");
-  }, 500); // wait for fade-out transition
+  }, 800); // match CSS transition
 }
 
 /* RNG GAME LOGIC */
@@ -297,6 +298,5 @@ rollBtn.onclick = () => {
   }, 16);
 };
 </script>
-
 </body>
 </html>
