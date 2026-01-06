@@ -1,166 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>RNG Gun Game . CO</title>
-<style>
-* {margin:0;padding:0;box-sizing:border-box;font-family:'Arial',sans-serif;}
-body {height:100vh;width:100vw;overflow:hidden;position:relative;display:flex;justify-content:center;align-items:center;background:#000;color:#fff;}
-
-/* FRONT PAGE */
-.front-bg {position:absolute;width:100%;height:100%;background:linear-gradient(#70c5ce,#bfefff);z-index:0;overflow:hidden;}
-.clouds, .pipes {position:absolute;width:100%;height:100%;top:0;left:0;}
-.clouds {background:radial-gradient(circle at 20% 30%,white 60px,transparent 61px),radial-gradient(circle at 30% 30%,white 80px,transparent 81px),radial-gradient(circle at 60% 40%,white 70px,transparent 71px);opacity:0.6;filter:blur(4px);animation:cloudsFloat 8s ease-in-out infinite alternate;}
-@keyframes cloudsFloat {0%{transform:translateY(0px);}50%{transform:translateY(10px);}100%{transform:translateY(0px);}}
-.pipes {display:flex;justify-content:space-around;height:100%;pointer-events:none;}
-.pipe-set {width:140px;height:100%;position:relative;}
-.pipe {position:absolute;width:140px;background:linear-gradient(#4caf50,#2e7d32);}
-.pipe.top {height:320px;top:-120px;border-radius:0 0 20px 20px;animation:pipeFloat 3s ease-in-out infinite alternate;}
-.pipe.bottom {height:320px;bottom:-120px;border-radius:20px 20px 0 0;animation:pipeFloat 3s ease-in-out infinite alternate-reverse;}
-@keyframes pipeFloat {0%{transform:translateY(0px);}50%{transform:translateY(20px);}100%{transform:translateY(0px);}}
-
-/* FRONT PANEL */
-.front-panel {position:absolute;z-index:5;background:rgba(30,30,30,0.85);padding:60px 80px;border-radius:30px;text-align:center;box-shadow:0 20px 0 #111;backdrop-filter:blur(6px);transition:all 0.8s ease;}
-.front-panel.hidden {opacity:0;transform:scale(0.8) rotate(-5deg);pointer-events:none;}
-.front-panel h1 {font-size:64px;color:#fff;margin-bottom:40px;text-shadow:0 4px 0 #000;}
-.enter-btn {font-size:36px;padding:25px 60px;border:none;border-radius:16px;background:linear-gradient(90deg,#00ffff,#00b06f);color:white;cursor:pointer;box-shadow:0 12px 0 #007a4a;transition:all 0.2s ease;}
-.enter-btn:hover {transform:translateY(-6px) scale(1.1);box-shadow:0 18px 0 #007a4a;}
-.front-panel p {color:#ccc;margin-top:20px;font-size:18px;}
-
-/* GAME PANEL */
-.menu {position:absolute;z-index:5;height:100%;width:100%;display:flex;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:opacity 0.8s ease;background:linear-gradient(#111,#222);}
-.menu.visible {opacity:1;pointer-events:all;}
-.panel {background:rgba(30,30,30,0.85);padding:40px 60px;border-radius:20px;box-shadow:0 20px 0 #111;text-align:center;width:500px;}
-h1.game-title {font-size:48px;color:white;margin-bottom:20px;}
-#result {font-size:32px;margin:20px 0;color:#ccc;}
-#gunImage {width:200px;height:auto;margin-bottom:20px;display:none;}
-button {font-size:28px;padding:15px 40px;border:none;border-radius:12px;background:#00b06f;color:white;cursor:pointer;box-shadow:0 8px 0 #007a4a;transition:all 0.15s ease;}
-button:hover:not(:disabled) {transform:translateY(-4px) scale(1.05);box-shadow:0 12px 0 #007a4a;}
-button:disabled {background:#555;box-shadow:0 6px 0 #333;cursor:not-allowed;}
-.cooldown {width:100%;height:18px;background:#333;border-radius:10px;margin-top:20px;overflow:hidden;}
-.cooldown-fill {height:100%;width:0%;background:linear-gradient(90deg,#00ffff,#00b06f);}
-</style>
+  <meta charset="UTF-8">
+  <title>Roll Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    #rollBtn {
+      padding: 20px 40px;
+      font-size: 24px;
+      background: #ffcc00;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 5px #cc9900;
+    }
+    #rollBtn:active {
+      box-shadow: 0 2px #cc9900;
+      transform: translateY(3px);
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 36px;
+      font-weight: bold;
+      color: #333;
+    }
+    #cooldownBar {
+      margin-top: 10px;
+      width: 200px;
+      height: 20px;
+      background: #ccc;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    #cooldownFill {
+      height: 100%;
+      width: 0%;
+      background: #4caf50;
+      transition: width 0.2s linear;
+    }
+  </style>
 </head>
 <body>
 
-<div class="front-bg">
-  <div class="clouds"></div>
-  <div class="pipes">
-    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
-    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
-    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
-    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+  <button id="rollBtn">Roll!</button>
+  <div id="result">?</div>
+  <div id="cooldownBar">
+    <div id="cooldownFill"></div>
   </div>
-</div>
 
-<div class="front-panel" id="frontPanel">
-  <h1>RNG GUN GAME . CO</h1>
-  <button class="enter-btn" onclick="enterGame()">ENTER</button>
-  <p>Experience the RNG chaos with style!</p>
-</div>
+  <!-- Add your GitHub raw link here -->
+  <audio id="rollSound" src="https://raw.githubusercontent.com/TheOnlyJimmyYT/theonlyjimmyyt.github.io/main/shake-and-roll-dice-soundbible%20(1).mp3"></audio>
 
-<div class="menu" id="gamePanel">
-  <div class="panel">
-    <h1 class="game-title">RNG GUN GAME</h1>
-    <img id="gunImage" src="" alt="Gun Image">
-    <div id="result">Click ROLL</div>
-    <button id="rollBtn">ROLL</button>
-    <div class="cooldown">
-      <div class="cooldown-fill" id="cooldownFill"></div>
-    </div>
-  </div>
-</div>
+  <script>
+    const rollBtn = document.getElementById("rollBtn");
+    const result = document.getElementById("result");
+    const rollSound = document.getElementById("rollSound");
+    const cooldownFill = document.getElementById("cooldownFill");
 
-<!-- AUDIO -->
-<audio id="rollSound" src=""></audio> <!-- Add your roll sound link here -->
-<audio id="rollSound" src="https://raw.githubusercontent.com/TheOnlyJimmyYT/theonlyjimmyyt.github.io/main/shake-and-roll-dice-soundbible%20(1).mp3"></audio>
-" loop autoplay></audio> <!-- Add your background music link here -->
+    let cooldown = false;
 
-<script>
-const frontPanel = document.getElementById("frontPanel");
-const gamePanel = document.getElementById("gamePanel");
-const rollBtn = document.getElementById("rollBtn");
-const result = document.getElementById("result");
-const fill = document.getElementById("cooldownFill");
-const gunImage = document.getElementById("gunImage");
-const rollSound = document.getElementById("rollSound");
-const bgMusic = document.getElementById("bgMusic");
+    rollBtn.addEventListener("click", () => {
+      if (cooldown) return;
 
-function enterGame() {
-  frontPanel.classList.add("hidden");
-  setTimeout(()=>{gamePanel.classList.add("visible");},800);
-  if(bgMusic.src) bgMusic.play();
-}
+      cooldown = true;
+      rollSound.currentTime = 0;
+      rollSound.play();
 
-/* RNG GAME LOGIC */
-const cooldownTime = 2000;
-let onCooldown = false;
+      // Roll logic
+      const rand = Math.random();
+      let outcome = "Common";
+      if (rand > 0.95) outcome = "Mythic";
+      else if (rand > 0.75) outcome = "Legendary";
+      else if (rand > 0.5) outcome = "Rare";
 
-// Add your gun images here per rarity
-const rarities = [
-  {
-    name:"COMMON",
-    weight:300,
-    color:"#bdbdbd",
-    img:"" // <-- PUT YOUR COMMON GUN IMAGE LINK HERE (from Google Images or Roblox asset)
-  },
-  {
-    name:"RARE",
-    weight:100,
-    color:"#4fc3f7",
-    img:"" // <-- PUT YOUR RARE GUN IMAGE LINK HERE
-  },
-  {
-    name:"LEGENDARY",
-    weight:30,
-    color:"#ffd54f",
-    img:"" // <-- PUT YOUR LEGENDARY GUN IMAGE LINK HERE
-  },
-  {
-    name:"MYTHIC",
-    weight:5,
-    color:"#e040fb",
-    img:"" // <-- PUT YOUR MYTHIC GUN IMAGE LINK HERE
-  }
-];
+      result.innerText = outcome;
 
-// PUT YOUR AUDIO LINKS HERE
-rollSound.src = ""; // <-- Roll sound link here
-bgMusic.src = "";   // <-- Background music link here (like Doors elevator music)
-
-rollBtn.onclick = ()=>{
-  if(onCooldown) return;
-  onCooldown = true;
-  rollBtn.disabled = true;
-  fill.style.width="0%";
-  
-  if(rollSound.src) { rollSound.currentTime=0; rollSound.play(); }
-  
-  const total = rarities.reduce((a,b)=>a+b.weight,0);
-  let r=Math.random()*total;
-  let chosen;
-  for(let x of rarities){
-    if(r<x.weight){chosen=x;break;}
-    r-=x.weight;
-  }
-  
-  result.textContent = chosen.name;
-  result.style.color = chosen.color;
-  
-  if(chosen.img){ 
-    gunImage.src = chosen.img; 
-    gunImage.style.display="block"; 
-  } else {
-    gunImage.style.display="none";
-  }
-  
-  let start=Date.now();
-  const i=setInterval(()=>{
-    let p=(Date.now()-start)/cooldownTime*100;
-    fill.style.width=Math.min(p,100)+"%";
-    if(p>=100){clearInterval(i);onCooldown=false;rollBtn.disabled=false;}
-  },16);
-};
-</script>
+      // Cooldown animation
+      let fill = 0;
+      const interval = setInterval(() => {
+        fill += 5;
+        cooldownFill.style.width = fill + "%";
+        if (fill >= 100) {
+          clearInterval(interval);
+          cooldown = false;
+          cooldownFill.style.width = "0%";
+        }
+      }, 100); // 100ms * 20 = 2 seconds cooldown
+    });
+  </script>
 </body>
 </html>
