@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>RNG Gun Game</title>
@@ -18,7 +18,7 @@ body {
   background: linear-gradient(#70c5ce, #bfefff);
 }
 
-/* Background motion */
+/* CLOUD BACKGROUND */
 .clouds {
   position: absolute;
   width: 200%;
@@ -37,7 +37,47 @@ body {
   to { transform: translateX(-50%); }
 }
 
-/* Center UI */
+/* FLAPPY PIPES */
+.pipes {
+  position: absolute;
+  width: 200%;
+  height: 100%;
+  display: flex;
+  gap: 320px;
+  animation: pipesMove 7s linear infinite;
+  filter: blur(3px);
+}
+
+.pipe-set {
+  width: 140px;
+  height: 100%;
+  position: relative;
+}
+
+.pipe {
+  position: absolute;
+  width: 140px;
+  background: linear-gradient(#4caf50, #2e7d32);
+}
+
+.pipe.top {
+  height: 320px;
+  top: -120px;
+  border-radius: 0 0 20px 20px;
+}
+
+.pipe.bottom {
+  height: 320px;
+  bottom: -120px;
+  border-radius: 20px 20px 0 0;
+}
+
+@keyframes pipesMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* UI */
 .menu {
   position: relative;
   z-index: 5;
@@ -68,7 +108,7 @@ h1 {
   color: #ccc;
 }
 
-/* Roll button */
+/* BUTTON */
 button {
   font-size: 28px;
   padding: 15px 40px;
@@ -82,13 +122,8 @@ button {
 }
 
 button:hover:not(:disabled) {
-  transform: translateY(-4px);
+  transform: translateY(-4px) scale(1.05);
   box-shadow: 0 12px 0 #007a4a;
-}
-
-button:active:not(:disabled) {
-  transform: translateY(4px);
-  box-shadow: 0 4px 0 #007a4a;
 }
 
 button:disabled {
@@ -97,7 +132,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Cooldown bar */
+/* COOLDOWN BAR */
 .cooldown {
   width: 100%;
   height: 18px;
@@ -119,13 +154,18 @@ button:disabled {
 
 <div class="clouds"></div>
 
+<div class="pipes">
+  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+</div>
+
 <div class="menu">
   <div class="panel">
     <h1>RNG GUN GAME</h1>
-
     <div id="result">Click ROLL</div>
-
-    <button id="rollBtn" onclick="roll()">ROLL</button>
+    <button id="rollBtn">ROLL</button>
 
     <div class="cooldown">
       <div class="cooldown-fill" id="cooldownFill"></div>
@@ -138,10 +178,9 @@ const rollBtn = document.getElementById("rollBtn");
 const result = document.getElementById("result");
 const fill = document.getElementById("cooldownFill");
 
-const cooldownTime = 2000; // 2 seconds
+const cooldownTime = 2000;
 let onCooldown = false;
 
-// RNG table
 const rarities = [
   { name: "COMMON", weight: 300, color: "#bdbdbd" },
   { name: "RARE", weight: 100, color: "#4fc3f7" },
@@ -149,42 +188,35 @@ const rarities = [
   { name: "MYTHIC", weight: 5, color: "#e040fb" }
 ];
 
-function roll() {
+rollBtn.onclick = () => {
   if (onCooldown) return;
-
   onCooldown = true;
   rollBtn.disabled = true;
   fill.style.width = "0%";
 
-  // RNG roll
-  const totalWeight = rarities.reduce((a, b) => a + b.weight, 0);
-  let rand = Math.random() * totalWeight;
+  const total = rarities.reduce((a, b) => a + b.weight, 0);
+  let r = Math.random() * total;
 
   let chosen;
-  for (let r of rarities) {
-    if (rand < r.weight) {
-      chosen = r;
-      break;
-    }
-    rand -= r.weight;
+  for (let x of rarities) {
+    if (r < x.weight) { chosen = x; break; }
+    r -= x.weight;
   }
 
   result.textContent = chosen.name;
   result.style.color = chosen.color;
 
-  // Cooldown animation
   let start = Date.now();
-  const interval = setInterval(() => {
-    let progress = (Date.now() - start) / cooldownTime * 100;
-    fill.style.width = Math.min(progress, 100) + "%";
-
-    if (progress >= 100) {
-      clearInterval(interval);
+  const i = setInterval(() => {
+    let p = (Date.now() - start) / cooldownTime * 100;
+    fill.style.width = Math.min(p, 100) + "%";
+    if (p >= 100) {
+      clearInterval(i);
       onCooldown = false;
       rollBtn.disabled = false;
     }
   }, 16);
-}
+};
 </script>
 
 </body>
