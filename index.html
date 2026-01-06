@@ -4,230 +4,88 @@
 <meta charset="UTF-8">
 <title>RNG Gun Game . CO</title>
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Arial', sans-serif;
-}
+/* ===== RESET ===== */
+* { margin:0; padding:0; box-sizing:border-box; font-family: 'Arial', sans-serif; }
+body, html { width:100%; height:100%; overflow:hidden; position:relative; }
 
-body {
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(#70c5ce, #bfefff);
+/* ===== BACKGROUND ===== */
+.front-bg {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  background: linear-gradient(#70c5ce, #bfefff); z-index:0; overflow:hidden;
 }
-
-/* CLOUDS */
+.clouds, .pipes { position:absolute; width:100%; height:100%; top:0; left:0; }
 .clouds {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
   background:
     radial-gradient(circle at 20% 30%, white 60px, transparent 61px),
     radial-gradient(circle at 30% 30%, white 80px, transparent 81px),
     radial-gradient(circle at 60% 40%, white 70px, transparent 71px);
-  opacity: 0.6;
-  filter: blur(4px);
+  opacity:0.6; filter: blur(4px);
   animation: cloudsFloat 8s ease-in-out infinite alternate;
 }
+@keyframes cloudsFloat { 0% {transform:translateY(0);} 50% {transform:translateY(10px);} 100% {transform:translateY(0);} }
+.pipes { display:flex; justify-content:space-around; height:100%; pointer-events:none; }
+.pipe-set { width:140px; height:100%; position:relative; }
+.pipe { position:absolute; width:140px; background: linear-gradient(#4caf50, #2e7d32); }
+.pipe.top { height:320px; top:-120px; border-radius:0 0 20px 20px; animation: pipeFloat 3s ease-in-out infinite alternate; }
+.pipe.bottom { height:320px; bottom:-120px; border-radius:20px 20px 0 0; animation: pipeFloat 3s ease-in-out infinite alternate-reverse; }
+@keyframes pipeFloat { 0%{transform:translateY(0);} 50%{transform:translateY(20px);} 100%{transform:translateY(0);} }
 
-@keyframes cloudsFloat {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(10px); }
-  100% { transform: translateY(0px); }
-}
-
-/* PIPES */
-.pipes {
-  position: absolute;
-  display: flex;
-  justify-content: space-around;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.pipe-set {
-  width: 140px;
-  height: 100%;
-  position: relative;
-}
-
-.pipe {
-  position: absolute;
-  width: 140px;
-  background: linear-gradient(#4caf50, #2e7d32);
-}
-
-.pipe.top {
-  height: 320px;
-  top: -120px;
-  border-radius: 0 0 20px 20px;
-  animation: pipeFloat 3s ease-in-out infinite alternate;
-}
-
-.pipe.bottom {
-  height: 320px;
-  bottom: -120px;
-  border-radius: 20px 20px 0 0;
-  animation: pipeFloat 3s ease-in-out infinite alternate-reverse;
-}
-
-@keyframes pipeFloat {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(20px); }
-  100% { transform: translateY(0px); }
-}
-
-/* FRONT PANEL */
+/* ===== FRONT PANEL ===== */
 .front-panel {
-  position: absolute;
-  z-index: 5;
-  background: rgba(30,30,30,0.85);
-  padding: 60px 80px;
-  border-radius: 30px;
-  text-align: center;
-  box-shadow: 0 20px 0 #111;
-  backdrop-filter: blur(6px);
-  transition: all 0.8s ease;
+  position:absolute; z-index:5; background: rgba(30,30,30,0.85);
+  padding:60px 80px; border-radius:30px; text-align:center;
+  box-shadow:0 20px 0 #111; backdrop-filter:blur(6px); transition: all 0.8s ease;
 }
-
-.front-panel.hidden {
-  opacity: 0;
-  transform: scale(0.8) rotate(-5deg);
-  pointer-events: none;
-}
-
-.front-panel h1 {
-  font-size: 64px;
-  color: #fff;
-  margin-bottom: 40px;
-  text-shadow: 0 4px 0 #000;
-}
-
+.front-panel.hidden { opacity:0; transform: scale(0.8) rotate(-5deg); pointer-events:none; }
+.front-panel h1 { font-size:64px; color:#fff; margin-bottom:40px; text-shadow:0 4px 0 #000; }
 .enter-btn {
-  font-size: 36px;
-  padding: 25px 60px;
-  border: none;
-  border-radius: 16px;
-  background: linear-gradient(90deg, #00ffff, #00b06f);
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 12px 0 #007a4a;
-  transition: all 0.2s ease;
+  font-size:36px; padding:25px 60px; border:none; border-radius:16px;
+  background: linear-gradient(90deg,#00ffff,#00b06f); color:white;
+  cursor:pointer; box-shadow:0 12px 0 #007a4a; transition: all 0.2s ease;
 }
+.enter-btn:hover { transform:translateY(-6px) scale(1.1); box-shadow:0 18px 0 #007a4a; }
+.front-panel p { color:#ccc; margin-top:20px; font-size:18px; }
 
-.enter-btn:hover {
-  transform: translateY(-6px) scale(1.1);
-  box-shadow: 0 18px 0 #007a4a;
-}
-
-.front-panel p {
-  color: #ccc;
-  margin-top: 20px;
-  font-size: 18px;
-}
-
-/* GAME PANEL */
+/* ===== GAME PANEL ===== */
 .menu {
-  position: absolute;
-  z-index: 5;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.8s ease;
-  background: linear-gradient(#111, #222);
+  position:absolute; z-index:5; height:100%; width:100%;
+  display:flex; justify-content:center; align-items:center;
+  opacity:0; pointer-events:none; transition:opacity 0.8s ease;
+  background: linear-gradient(#111,#222);
 }
-
-.menu.visible {
-  opacity: 1;
-  pointer-events: all;
-}
-
+.menu.visible { opacity:1; pointer-events:all; }
 .panel {
-  background: rgba(30,30,30,0.85);
-  padding: 40px 60px;
-  border-radius: 20px;
-  box-shadow: 0 20px 0 #111;
-  text-align: center;
-  width: 420px;
+  background: rgba(30,30,30,0.85); padding:40px 60px; border-radius:20px;
+  box-shadow:0 20px 0 #111; text-align:center; width:420px;
 }
-
-h1.game-title {
-  font-size: 48px;
-  color: white;
-  margin-bottom: 20px;
-}
-
-#result {
-  font-size: 32px;
-  margin: 20px 0;
-  color: #ccc;
-}
-
+h1.game-title { font-size:48px; color:white; margin-bottom:20px; }
+#result { font-size:32px; margin:20px 0; color:#ccc; }
 button {
-  font-size: 28px;
-  padding: 15px 40px;
-  border: none;
-  border-radius: 12px;
-  background: #00b06f;
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 8px 0 #007a4a;
-  transition: all 0.15s ease;
+  font-size:28px; padding:15px 40px; border:none; border-radius:12px;
+  background:#00b06f; color:white; cursor:pointer; box-shadow:0 8px 0 #007a4a; transition: all 0.15s ease;
 }
+button:hover:not(:disabled) { transform:translateY(-4px) scale(1.05); box-shadow:0 12px 0 #007a4a; }
+button:disabled { background:#555; box-shadow:0 6px 0 #333; cursor:not-allowed; }
+.cooldown { width:100%; height:18px; background:#333; border-radius:10px; margin-top:20px; overflow:hidden; }
+.cooldown-fill { height:100%; width:0%; background: linear-gradient(90deg,#00ffff,#00b06f); }
 
-button:hover:not(:disabled) {
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 0 12px 0 #007a4a;
-}
-
-button:disabled {
-  background: #555;
-  box-shadow: 0 6px 0 #333;
-  cursor: not-allowed;
-}
-
-.cooldown {
-  width: 100%;
-  height: 18px;
-  background: #333;
-  border-radius: 10px;
-  margin-top: 20px;
-  overflow: hidden;
-}
-
-.cooldown-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #00ffff, #00b06f);
-}
 </style>
 </head>
 <body>
 
 <!-- AUDIO -->
 <audio id="bgMusic" src="https://raw.githubusercontent.com/TheOnlyJimmyYT/theonlyjimmyyt.github.io/main/Bossa%20Me.mp3" loop autoplay></audio>
-<audio id="diceSound" src="shake-and-roll-dice-soundbible.mp3"></audio>
+<audio id="diceSound" src="https://raw.githubusercontent.com/TheOnlyJimmyYT/theonlyjimmyyt.github.io/main/shake-and-roll-dice-soundbible%20(1).mp3"></audio>
 
-<!-- Front page background -->
-<div class="clouds"></div>
-<div class="pipes">
-  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
-  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
-  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
-  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+<!-- FRONT BACKGROUND -->
+<div class="front-bg">
+  <div class="clouds"></div>
+  <div class="pipes">
+    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+  </div>
 </div>
 
 <!-- FRONT PANEL -->
@@ -250,79 +108,66 @@ button:disabled {
 </div>
 
 <script>
-// Transition from front page to game
 const frontPanel = document.getElementById("frontPanel");
 const gamePanel = document.getElementById("gamePanel");
-const bgMusic = document.getElementById("bgMusic");
-
-function enterGame() {
-  frontPanel.classList.add("hidden");
-  setTimeout(() => {
-    gamePanel.classList.add("visible");
-  }, 800);
-}
-
-/* RNG GAME LOGIC */
 const rollBtn = document.getElementById("rollBtn");
 const result = document.getElementById("result");
 const fill = document.getElementById("cooldownFill");
+
+const bgMusic = document.getElementById("bgMusic");
 const diceSound = document.getElementById("diceSound");
 
+// Keep music playing when switching panels
+bgMusic.volume = 0.6;
+bgMusic.play();
+
+// Enter game transition
+function enterGame() {
+  frontPanel.classList.add("hidden");
+  setTimeout(() => { gamePanel.classList.add("visible"); }, 800);
+}
+
+// RNG logic
 const cooldownTime = 2000;
 let onCooldown = false;
-
 const rarities = [
-  { name: "COMMON", weight: 300, color: "#bdbdbd" },
-  { name: "RARE", weight: 100, color: "#4fc3f7" },
-  { name: "LEGENDARY", weight: 30, color: "#ffd54f" },
-  { name: "MYTHIC", weight: 5, color: "#e040fb" }
+  { name:"COMMON", weight:300, color:"#bdbdbd" },
+  { name:"RARE", weight:100, color:"#4fc3f7" },
+  { name:"LEGENDARY", weight:30, color:"#ffd54f" },
+  { name:"MYTHIC", weight:5, color:"#e040fb" }
 ];
 
 rollBtn.onclick = () => {
-  if (onCooldown) return;
+  if(onCooldown) return;
+
+  // Play dice sound
+  diceSound.currentTime = 0;
+  diceSound.play();
+
   onCooldown = true;
   rollBtn.disabled = true;
   fill.style.width = "0%";
 
-  // Play dice roll sound
-  diceSound.currentTime = 0;
-  diceSound.play();
-
-  // RNG roll
-  const total = rarities.reduce((a, b) => a + b.weight, 0);
-  let r = Math.random() * total;
-
+  // RNG pick
+  const total = rarities.reduce((a,b)=>a+b.weight,0);
+  let r = Math.random()*total;
   let chosen;
-  for (let x of rarities) {
-    if (r < x.weight) { chosen = x; break; }
-    r -= x.weight;
+  for(let x of rarities){
+    if(r<x.weight){ chosen=x; break; }
+    r-=x.weight;
   }
 
   result.textContent = chosen.name;
   result.style.color = chosen.color;
 
-  // Cooldown bar animation
+  // cooldown bar animation
   let start = Date.now();
-  const i = setInterval(() => {
-    let p = (Date.now() - start) / cooldownTime * 100;
-    fill.style.width = Math.min(p, 100) + "%";
-    if (p >= 100) {
-      clearInterval(i);
-      onCooldown = false;
-      rollBtn.disabled = false;
-    }
-  }, 16);
+  const i = setInterval(()=>{
+    let p = (Date.now()-start)/cooldownTime*100;
+    fill.style.width = Math.min(p,100)+"%";
+    if(p>=100){ clearInterval(i); onCooldown=false; rollBtn.disabled=false; }
+  },16);
 };
 </script>
 </body>
 </html>
-const bgMusic = document.getElementById("bgMusic");
-const diceSound = document.getElementById("diceSound");
-
-// Play dice sound on roll
-rollBtn.onclick = () => {
-  if (onCooldown) return;
-  diceSound.currentTime = 0;
-  diceSound.play();
-  // ... rest of your roll logic
-};
