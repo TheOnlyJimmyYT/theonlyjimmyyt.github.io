@@ -19,6 +19,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  background: #000;
+  color: #fff;
 }
 
 /* FRONT PAGE BACKGROUND */
@@ -55,7 +57,6 @@ body {
   100% { transform: translateY(0px); }
 }
 
-/* Pipes just float a bit */
 .pipes {
   display: flex;
   justify-content: space-around;
@@ -170,7 +171,7 @@ body {
   border-radius: 20px;
   box-shadow: 0 20px 0 #111;
   text-align: center;
-  width: 420px;
+  width: 500px;
 }
 
 h1.game-title {
@@ -183,6 +184,13 @@ h1.game-title {
   font-size: 32px;
   margin: 20px 0;
   color: #ccc;
+}
+
+#gunImage {
+  width: 200px;
+  height: auto;
+  margin-bottom: 20px;
+  display: none;
 }
 
 button {
@@ -248,6 +256,7 @@ button:disabled {
 <div class="menu" id="gamePanel">
   <div class="panel">
     <h1 class="game-title">RNG GUN GAME</h1>
+    <img id="gunImage" src="" alt="Gun Image">
     <div id="result">Click ROLL</div>
     <button id="rollBtn">ROLL</button>
     <div class="cooldown">
@@ -256,31 +265,37 @@ button:disabled {
   </div>
 </div>
 
+<!-- AUDIO -->
+<audio id="rollSound" src="https://freesound.org/data/previews/466/466969_992484-lq.mp3"></audio>
+<audio id="bgMusic" src="https://freesound.org/data/previews/560/560028_8877162-lq.mp3" loop autoplay></audio>
+
 <script>
-// Transition from front page to game
 const frontPanel = document.getElementById("frontPanel");
 const gamePanel = document.getElementById("gamePanel");
+const rollBtn = document.getElementById("rollBtn");
+const result = document.getElementById("result");
+const fill = document.getElementById("cooldownFill");
+const gunImage = document.getElementById("gunImage");
+const rollSound = document.getElementById("rollSound");
+const bgMusic = document.getElementById("bgMusic");
 
 function enterGame() {
   frontPanel.classList.add("hidden");
   setTimeout(() => {
     gamePanel.classList.add("visible");
   }, 800);
+  bgMusic.play();
 }
 
 /* RNG GAME LOGIC */
-const rollBtn = document.getElementById("rollBtn");
-const result = document.getElementById("result");
-const fill = document.getElementById("cooldownFill");
-
 const cooldownTime = 2000;
 let onCooldown = false;
 
 const rarities = [
-  { name: "COMMON", weight: 300, color: "#bdbdbd" },
-  { name: "RARE", weight: 100, color: "#4fc3f7" },
-  { name: "LEGENDARY", weight: 30, color: "#ffd54f" },
-  { name: "MYTHIC", weight: 5, color: "#e040fb" }
+  { name: "COMMON", weight: 300, color: "#bdbdbd", img: "https://i.imgur.com/NyQ2vYX.png" },
+  { name: "RARE", weight: 100, color: "#4fc3f7", img: "https://i.imgur.com/3bqKpLf.png" },
+  { name: "LEGENDARY", weight: 30, color: "#ffd54f", img: "https://i.imgur.com/LmQJ1RR.png" },
+  { name: "MYTHIC", weight: 5, color: "#e040fb", img: "https://i.imgur.com/Y9wPMhG.png" }
 ];
 
 rollBtn.onclick = () => {
@@ -288,6 +303,10 @@ rollBtn.onclick = () => {
   onCooldown = true;
   rollBtn.disabled = true;
   fill.style.width = "0%";
+
+  // play roll sound
+  rollSound.currentTime = 0;
+  rollSound.play();
 
   const total = rarities.reduce((a, b) => a + b.weight, 0);
   let r = Math.random() * total;
@@ -300,6 +319,8 @@ rollBtn.onclick = () => {
 
   result.textContent = chosen.name;
   result.style.color = chosen.color;
+  gunImage.src = chosen.img;
+  gunImage.style.display = "block";
 
   let start = Date.now();
   const i = setInterval(() => {
