@@ -13,43 +13,54 @@
 
 body {
   height: 100vh;
+  width: 100vw;
   overflow: hidden;
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
 }
 
-/* COMMON BACKGROUNDS */
+/* FRONT PAGE BACKGROUND */
+.front-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(#70c5ce, #bfefff);
+  z-index: 0;
+  overflow: hidden;
+}
+
 .clouds, .pipes {
   position: absolute;
-  width: 200%;
+  width: 100%;
   height: 100%;
-  z-index: 0;
+  top: 0;
+  left: 0;
 }
 
-/* CLOUDS */
 .clouds {
   background:
     radial-gradient(circle at 20% 30%, white 60px, transparent 61px),
     radial-gradient(circle at 30% 30%, white 80px, transparent 81px),
     radial-gradient(circle at 60% 40%, white 70px, transparent 71px);
   opacity: 0.6;
-  animation: cloudsMove 40s linear infinite;
   filter: blur(4px);
+  animation: cloudsFloat 8s ease-in-out infinite alternate;
 }
 
-@keyframes cloudsMove {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+@keyframes cloudsFloat {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(10px); }
+  100% { transform: translateY(0px); }
 }
 
-/* FLAPPY PIPES */
+/* Pipes just float a bit */
 .pipes {
   display: flex;
-  gap: 320px;
-  animation: pipesMove 7s linear infinite;
-  filter: blur(3px);
+  justify-content: space-around;
+  height: 100%;
+  pointer-events: none;
 }
 
 .pipe-set {
@@ -68,17 +79,20 @@ body {
   height: 320px;
   top: -120px;
   border-radius: 0 0 20px 20px;
+  animation: pipeFloat 3s ease-in-out infinite alternate;
 }
 
 .pipe.bottom {
   height: 320px;
   bottom: -120px;
   border-radius: 20px 20px 0 0;
+  animation: pipeFloat 3s ease-in-out infinite alternate-reverse;
 }
 
-@keyframes pipesMove {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+@keyframes pipeFloat {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(20px); }
+  100% { transform: translateY(0px); }
 }
 
 /* FRONT PANEL */
@@ -100,7 +114,6 @@ body {
   pointer-events: none;
 }
 
-/* FRONT PAGE TEXT */
 .front-panel h1 {
   font-size: 64px;
   color: #fff;
@@ -118,7 +131,6 @@ body {
   cursor: pointer;
   box-shadow: 0 12px 0 #007a4a;
   transition: all 0.2s ease;
-  backdrop-filter: blur(2px);
 }
 
 .enter-btn:hover {
@@ -137,13 +149,14 @@ body {
   position: absolute;
   z-index: 5;
   height: 100%;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.8s ease;
-  background: linear-gradient(#111, #222); /* new game background */
+  background: linear-gradient(#111, #222); /* Game BG */
 }
 
 .menu.visible {
@@ -213,16 +226,18 @@ button:disabled {
 </head>
 <body>
 
-<div class="clouds"></div>
-
-<div class="pipes">
-  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
-  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
-  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
-  <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+<!-- Front page background -->
+<div class="front-bg">
+  <div class="clouds"></div>
+  <div class="pipes">
+    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+    <div class="pipe-set"><div class="pipe top"></div><div class="pipe bottom"></div></div>
+  </div>
 </div>
 
-<!-- FRONT PAGE -->
+<!-- FRONT PANEL -->
 <div class="front-panel" id="frontPanel">
   <h1>RNG GUN GAME . CO</h1>
   <button class="enter-btn" onclick="enterGame()">ENTER</button>
@@ -250,7 +265,7 @@ function enterGame() {
   frontPanel.classList.add("hidden");
   setTimeout(() => {
     gamePanel.classList.add("visible");
-  }, 800); // match CSS transition
+  }, 800);
 }
 
 /* RNG GAME LOGIC */
