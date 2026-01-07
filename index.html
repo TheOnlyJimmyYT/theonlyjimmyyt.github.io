@@ -4,39 +4,64 @@
 <meta charset="UTF-8">
 <title>RNG Gun Game . CO</title>
 <style>
-/* ===== RESET ===== */
-* { margin:0; padding:0; box-sizing:border-box; font-family: 'Arial', sans-serif; }
-body, html { width:100%; height:100%; overflow:hidden; position:relative; }
+html, body {
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:0;
+  font-family: 'Arial', sans-serif;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#70c5ce;
+  overflow:hidden;
+  position:relative;
+}
 
 /* ===== BACKGROUND ===== */
 .front-bg {
-  position:absolute; top:0; left:0; width:100%; height:100%;
-  background: linear-gradient(#70c5ce, #bfefff); z-index:0; overflow:hidden;
+  position:absolute;
+  top:0; left:0;
+  width:100%;
+  height:100%;
+  background: linear-gradient(#70c5ce,#bfefff);
+  z-index:0;
+  overflow:hidden;
 }
-.clouds, .pipes { position:absolute; width:100%; height:100%; top:0; left:0; }
 .clouds {
+  position:absolute;
+  width:100%;
+  height:100%;
   background:
     radial-gradient(circle at 20% 30%, white 60px, transparent 61px),
     radial-gradient(circle at 30% 30%, white 80px, transparent 81px),
     radial-gradient(circle at 60% 40%, white 70px, transparent 71px);
-  opacity:0.6; filter: blur(4px);
+  opacity:0.6;
+  filter:blur(4px);
   animation: cloudsFloat 8s ease-in-out infinite alternate;
 }
-@keyframes cloudsFloat { 0% {transform:translateY(0);} 50% {transform:translateY(10px);} 100% {transform:translateY(0);} }
+@keyframes cloudsFloat {0%{transform:translateY(0);}50%{transform:translateY(10px);}100%{transform:translateY(0);} }
+
 .pipes { display:flex; justify-content:space-around; height:100%; pointer-events:none; }
 .pipe-set { width:140px; height:100%; position:relative; }
 .pipe { position:absolute; width:140px; background: linear-gradient(#4caf50, #2e7d32); }
 .pipe.top { height:320px; top:-120px; border-radius:0 0 20px 20px; animation: pipeFloat 3s ease-in-out infinite alternate; }
 .pipe.bottom { height:320px; bottom:-120px; border-radius:20px 20px 0 0; animation: pipeFloat 3s ease-in-out infinite alternate-reverse; }
-@keyframes pipeFloat { 0%{transform:translateY(0);} 50%{transform:translateY(20px);} 100%{transform:translateY(0);} }
+@keyframes pipeFloat {0%{transform:translateY(0);}50%{transform:translateY(20px);}100%{transform:translateY(0);}}
 
 /* ===== FRONT PANEL ===== */
 .front-panel {
-  position:absolute; z-index:5; background: rgba(30,30,30,0.85);
-  padding:60px 80px; border-radius:30px; text-align:center;
-  box-shadow:0 20px 0 #111; backdrop-filter:blur(6px); transition: all 0.8s ease;
+  position:relative;
+  z-index:5;
+  background: rgba(30,30,30,0.85);
+  padding:60px 80px;
+  border-radius:30px;
+  text-align:center;
+  box-shadow:0 20px 0 #111;
+  backdrop-filter:blur(6px);
+  transition: all 0.8s ease;
 }
-.front-panel.hidden { opacity:0; transform: scale(0.8) rotate(-5deg); pointer-events:none; }
+.front-panel.hidden { opacity:0; transform:scale(0.8) rotate(-5deg); pointer-events:none; }
 .front-panel h1 { font-size:64px; color:#fff; margin-bottom:40px; text-shadow:0 4px 0 #000; }
 .enter-btn {
   font-size:36px; padding:25px 60px; border:none; border-radius:16px;
@@ -74,7 +99,7 @@ button:disabled { background:#555; box-shadow:0 6px 0 #333; cursor:not-allowed; 
 <body>
 
 <!-- AUDIO -->
-<audio id="bgMusic" src="https://raw.githubusercontent.com/TheOnlyJimmyYT/theonlyjimmyyt.github.io/main/Bossa%20Me.mp3" loop autoplay></audio>
+<audio id="bgMusic" src="https://raw.githubusercontent.com/TheOnlyJimmyYT/theonlyjimmyyt.github.io/main/Bossa%20Me.mp3" loop></audio>
 <audio id="diceSound" src="https://raw.githubusercontent.com/TheOnlyJimmyYT/theonlyjimmyyt.github.io/main/shake-and-roll-dice-soundbible%20(1).mp3"></audio>
 
 <!-- FRONT BACKGROUND -->
@@ -91,7 +116,7 @@ button:disabled { background:#555; box-shadow:0 6px 0 #333; cursor:not-allowed; 
 <!-- FRONT PANEL -->
 <div class="front-panel" id="frontPanel">
   <h1>RNG GUN GAME . CO</h1>
-  <button class="enter-btn" onclick="enterGame()">ENTER</button>
+  <button class="enter-btn" id="enterBtn">ENTER</button>
   <p>Experience the RNG chaos with style!</p>
 </div>
 
@@ -110,6 +135,7 @@ button:disabled { background:#555; box-shadow:0 6px 0 #333; cursor:not-allowed; 
 <script>
 const frontPanel = document.getElementById("frontPanel");
 const gamePanel = document.getElementById("gamePanel");
+const enterBtn = document.getElementById("enterBtn");
 const rollBtn = document.getElementById("rollBtn");
 const result = document.getElementById("result");
 const fill = document.getElementById("cooldownFill");
@@ -117,38 +143,33 @@ const fill = document.getElementById("cooldownFill");
 const bgMusic = document.getElementById("bgMusic");
 const diceSound = document.getElementById("diceSound");
 
-// Keep music playing when switching panels
-bgMusic.volume = 0.6;
-bgMusic.play();
-
-// Enter game transition
-function enterGame() {
-  frontPanel.classList.add("hidden");
-  setTimeout(() => { gamePanel.classList.add("visible"); }, 800);
-}
-
-// RNG logic
-const cooldownTime = 2000;
-let onCooldown = false;
 const rarities = [
   { name:"COMMON", weight:300, color:"#bdbdbd" },
   { name:"RARE", weight:100, color:"#4fc3f7" },
   { name:"LEGENDARY", weight:30, color:"#ffd54f" },
   { name:"MYTHIC", weight:5, color:"#e040fb" }
 ];
+const cooldownTime = 2000;
+let onCooldown=false;
 
+// ENTER BUTTON STARTS MUSIC
+enterBtn.onclick = () => {
+  bgMusic.volume = 0.6;
+  bgMusic.play().catch(()=>{console.log("User interaction required to play audio")});
+  frontPanel.classList.add("hidden");
+  setTimeout(()=>{ gamePanel.classList.add("visible"); },800);
+};
+
+// ROLL BUTTON
 rollBtn.onclick = () => {
   if(onCooldown) return;
-
-  // Play dice sound
-  diceSound.currentTime = 0;
+  onCooldown=true;
+  rollBtn.disabled=true;
+  fill.style.width="0%";
+  
+  diceSound.currentTime=0;
   diceSound.play();
-
-  onCooldown = true;
-  rollBtn.disabled = true;
-  fill.style.width = "0%";
-
-  // RNG pick
+  
   const total = rarities.reduce((a,b)=>a+b.weight,0);
   let r = Math.random()*total;
   let chosen;
@@ -156,12 +177,11 @@ rollBtn.onclick = () => {
     if(r<x.weight){ chosen=x; break; }
     r-=x.weight;
   }
-
-  result.textContent = chosen.name;
-  result.style.color = chosen.color;
-
-  // cooldown bar animation
-  let start = Date.now();
+  
+  result.textContent=chosen.name;
+  result.style.color=chosen.color;
+  
+  let start=Date.now();
   const i = setInterval(()=>{
     let p = (Date.now()-start)/cooldownTime*100;
     fill.style.width = Math.min(p,100)+"%";
@@ -169,5 +189,6 @@ rollBtn.onclick = () => {
   },16);
 };
 </script>
+
 </body>
 </html>
